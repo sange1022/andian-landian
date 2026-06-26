@@ -1,16 +1,41 @@
 # 暗淡蓝点
 
-暗淡蓝点 is a tiny desktop pomodoro timer for Windows and macOS.
+暗淡蓝点是一个极简桌面番茄钟，当前发布版支持 macOS Apple Silicon。
 
-## Behavior
+## 下载
 
-- Floating always-on-top black circle.
-- Only `25` and `45` minute modes.
-- Left click starts or pauses the timer.
-- Right click opens the native menu.
-- The circle starts faint and becomes darker as the timer approaches zero.
-- When time is up, the circle grows repeatedly.
-- Click the finished circle three times to dismiss it.
+前往 Releases 下载最新版：
+
+https://github.com/sange1022/andian-landian/releases
+
+当前 macOS 安装包：`andian-landian-1.0.11-arm64.dmg`
+
+## 安装
+
+1. 下载 `.dmg` 文件。
+2. 打开 `.dmg`，把 `暗淡蓝点.app` 拖到 `Applications`。
+3. 如果 macOS 提示无法验证开发者，右键点击 App 选择“打开”，或到系统设置的安全性里允许打开。
+
+## 使用说明
+
+- 启动后，状态栏会显示蓝点和剩余分钟数。
+- 桌面上会出现一个克莱因蓝圆点。
+- 左键按住桌面圆点可以拖动位置。
+- 双击桌面圆点可以开始或暂停。
+- 状态栏左键双击也可以开始或暂停。
+- 状态栏右键打开菜单。
+- 桌面圆点右键打开菜单。
+- 设置里有 `5 / 25 / 45` 分钟快捷按钮。
+- 设置里也可以输入自定义时间，范围是 `1-180` 分钟。
+- 开始计时后，蓝点会变成半透明。
+- 时间到后，状态栏会闪烁，系统会响一声，桌面圆点会放大提醒。
+- 时间到后，需要连续点击圆点 3 下才会取消提醒。
+
+## 注意
+
+- 当前 release 是 `arm64`，适合 M 系列 Mac。
+- 当前版本未做 Apple Developer ID 签名，所以第一次打开可能需要手动允许。
+- Windows 版本源码配置仍保留，但当前 GitHub release 只上传了 macOS 安装包。
 
 ## Development
 
