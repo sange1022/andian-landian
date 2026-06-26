@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>暗淡蓝点 设置</title>
+    <link rel="stylesheet" href="./settings.css">
+  </head>
+  <body>
+    <main>
+      <section class="status">
+        <div class="dot"></div>
+        <div>
+          <div id="time" class="time">25</div>
+          <div id="state" class="state">idle</div>
+        </div>
+      </section>
+
+      <section class="duration" aria-label="Duration">
+        <button id="duration5" type="button">5</button>
+        <button id="duration25" type="button">25</button>
+        <button id="duration45" type="button">45</button>
+      </section>
+
+      <section class="custom-duration" aria-label="Custom duration">
+        <input id="customMinutes" type="number" min="1" max="180" step="1" value="25" aria-label="Custom minutes">
+        <button id="setCustom" type="button">Set</button>
+      </section>
+
+      <section class="actions">
+        <button id="toggle" type="button">Start / Pause</button>
+        <button id="reset" type="button">Reset</button>
+        <button id="quit" type="button">Quit</button>
+      </section>
+
+      <footer>戌無营造</footer>
+    </main>
+    <script src="./settings.js"></script>
+  </body>
+</html>
