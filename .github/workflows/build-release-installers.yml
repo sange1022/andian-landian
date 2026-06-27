@@ -1,0 +1,68 @@
+name: Build release installers
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Release tag to receive the installers
+        required: true
+        default: v1.0.12
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: windows-latest
+            build_command: npm run dist:win
+            source_pattern: "*Setup*.exe"
+            asset_suffix: win-x64.exe
+            asset_label: "暗淡蓝点 Windows 10 x64 安装包"
+          - runner: macos-latest
+            build_command: npm run dist:mac
+            source_pattern: "*-arm64.dmg"
+            asset_suffix: mac-arm64.dmg
+            asset_label: "暗淡蓝点 Mac ARM64 安装包"
+    runs-on: ${{ matrix.runner }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - run: npm ci
+
+      - run: npm test
+
+      - run: ${{ matrix.build_command }}
+
+      - name: Prepare release asset
+        id: asset
+        shell: bash
+        env:
+          TAG: ${{ inputs.tag }}
+          SOURCE_PATTERN: ${{ matrix.source_pattern }}
+          ASSET_SUFFIX: ${{ matrix.asset_suffix }}
+        run: |
+          version="${TAG#v}"
+          source_file="$(find dist -maxdepth 1 -type f -name "$SOURCE_PATTERN" -print -quit)"
+          asset_path="dist/andian-landian-${version}-${ASSET_SUFFIX}"
+          test -n "$source_file"
+          cp "$source_file" "$asset_path"
+          echo "path=$asset_path" >> "$GITHUB_OUTPUT"
+
+      - name: Upload installer to release
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ inputs.tag }}
+          ASSET_PATH: ${{ steps.asset.outputs.path }}
+          ASSET_LABEL: ${{ matrix.asset_label }}
+        run: gh release upload "$TAG" "$ASSET_PATH#$ASSET_LABEL" --clobber
