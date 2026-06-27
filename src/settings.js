@@ -10,6 +10,8 @@ const {
 } = window.customDuration;
 
 let currentDuration = 25;
+let isCustomEditing = false;
+let pendingCustomMinutes = null;
 
 function command(commandName, value) {
   window.pomodoro.sendSettingsCommand({ command: commandName, value });
@@ -21,16 +23,31 @@ function setDurationButton(minutes) {
   duration45.classList.toggle("active", minutes === 45);
 }
 
-duration5.addEventListener("click", () => command("duration", 5));
-duration25.addEventListener("click", () => command("duration", 25));
-duration45.addEventListener("click", () => command("duration", 45));
+function choosePresetDuration(minutes) {
+  isCustomEditing = false;
+  pendingCustomMinutes = null;
+  command("duration", minutes);
+}
+
+duration5.addEventListener("click", () => choosePresetDuration(5));
+duration25.addEventListener("click", () => choosePresetDuration(25));
+duration45.addEventListener("click", () => choosePresetDuration(45));
+
+customMinutes.addEventListener("input", () => {
+  isCustomEditing = true;
+  pendingCustomMinutes = null;
+});
 
 function applyCustomDuration() {
   const minutes = parseCustomMinutes(customMinutes.value);
   if (minutes === null) {
     customMinutes.value = String(currentDuration);
+    isCustomEditing = false;
+    pendingCustomMinutes = null;
     return;
   }
+  isCustomEditing = true;
+  pendingCustomMinutes = minutes;
   command("duration", minutes);
 }
 
@@ -50,8 +67,14 @@ window.pomodoro.onTimerState((timerState) => {
   currentDuration = timerState.durationMinutes;
   time.textContent = timerState.remainingText;
   state.textContent = timerState.status;
-  if (shouldSyncCustomMinutes(document.activeElement === customMinutes)) {
+  if (shouldSyncCustomMinutes({
+    isEditing: isCustomEditing,
+    pendingMinutes: pendingCustomMinutes,
+    timerMinutes: timerState.durationMinutes
+  })) {
     customMinutes.value = String(timerState.durationMinutes);
+    isCustomEditing = false;
+    pendingCustomMinutes = null;
   }
   setDurationButton(timerState.durationMinutes);
 });

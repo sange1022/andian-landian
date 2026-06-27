@@ -13,8 +13,8 @@
     return minutes;
   }
 
-  function shouldSyncCustomMinutes(isFocused) {
-    return !isFocused;
+  function shouldSyncCustomMinutes({ isEditing, pendingMinutes, timerMinutes }) {
+    return !isEditing || (pendingMinutes !== null && pendingMinutes === timerMinutes);
   }
 
   return { parseCustomMinutes, shouldSyncCustomMinutes };
