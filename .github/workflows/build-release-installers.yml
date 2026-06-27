@@ -18,12 +18,12 @@ jobs:
       matrix:
         include:
           - runner: windows-latest
-            build_command: npm run dist:win
+            build_command: npm run dist:win -- --publish never
             source_pattern: "*Setup*.exe"
             asset_suffix: win-x64.exe
             asset_label: "暗淡蓝点 Windows 10 x64 安装包"
           - runner: macos-latest
-            build_command: npm run dist:mac
+            build_command: npm run dist:mac -- --publish never
             source_pattern: "*-arm64.dmg"
             asset_suffix: mac-arm64.dmg
             asset_label: "暗淡蓝点 Mac ARM64 安装包"
