@@ -3,6 +3,7 @@ const path = require("node:path");
 const { getMenuBarTitle } = require("./menuBar");
 const { PRESET_DURATIONS } = require("./durations");
 const { getDraggedWindowPosition } = require("./windowDrag");
+const { getWindowVisibilityMenuItem } = require("./windowVisibility");
 
 let mainWindow;
 let settingsWindow;
@@ -74,8 +75,35 @@ function stopMenuBarBlink() {
   blinkVisible = true;
 }
 
+function toggleMainWindowVisibility(action) {
+  if (!mainWindow || mainWindow.isDestroyed()) {
+    return;
+  }
+
+  if (action === "hide") {
+    mainWindow.hide();
+  }
+  if (action === "show") {
+    mainWindow.show();
+    mainWindow.focus();
+  }
+
+  if (tray && process.platform !== "darwin") {
+    tray.setContextMenu(buildContextMenu());
+  }
+}
+
 function buildContextMenu() {
+  const visibilityItem = getWindowVisibilityMenuItem(
+    Boolean(mainWindow && !mainWindow.isDestroyed() && mainWindow.isVisible())
+  );
+
   return Menu.buildFromTemplate([
+    {
+      label: visibilityItem.label,
+      click: () => toggleMainWindowVisibility(visibilityItem.action)
+    },
+    { type: "separator" },
     { label: "Settings", click: () => createSettingsWindow() },
     { type: "separator" },
     ...PRESET_DURATIONS.map((minutes) => ({
