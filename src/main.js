@@ -4,6 +4,10 @@ const { getMenuBarTitle } = require("./menuBar");
 const { PRESET_DURATIONS } = require("./durations");
 const { getDraggedWindowPosition } = require("./windowDrag");
 const { getWindowVisibilityMenuItem } = require("./windowVisibility");
+const { resizeBoundsAroundCenter } = require("./alertWindow");
+
+const NORMAL_WINDOW_SIZE = 112;
+const ALERT_WINDOW_SIZE = NORMAL_WINDOW_SIZE * 3;
 
 let mainWindow;
 let settingsWindow;
@@ -23,8 +27,12 @@ function sendCommand(command, value) {
 
 function sendTimerState(state) {
   const wasFinished = latestTimerState.status === "finished";
+  const isFinished = state.status === "finished";
   latestTimerState = state;
-  if (state.status === "finished" && !wasFinished) {
+  if (isFinished !== wasFinished) {
+    setAlertWindowSize(isFinished);
+  }
+  if (isFinished && !wasFinished) {
     playFinishSound();
     startMenuBarBlink();
   }
@@ -36,6 +44,23 @@ function sendTimerState(state) {
   if (settingsWindow && !settingsWindow.isDestroyed()) {
     settingsWindow.webContents.send("timer-state", state);
   }
+}
+
+function setAlertWindowSize(isAlerting) {
+  if (!mainWindow || mainWindow.isDestroyed()) {
+    return;
+  }
+
+  const targetSize = isAlerting ? ALERT_WINDOW_SIZE : NORMAL_WINDOW_SIZE;
+  const bounds = mainWindow.getBounds();
+  if (bounds.width === targetSize && bounds.height === targetSize) {
+    return;
+  }
+
+  mainWindow.setBounds(
+    resizeBoundsAroundCenter(bounds, targetSize, targetSize),
+    false
+  );
 }
 
 function updateTrayTitle(state) {
@@ -146,8 +171,8 @@ function createSettingsWindow() {
 
 function createWindow() {
   mainWindow = new BrowserWindow({
-    width: 112,
-    height: 112,
+    width: NORMAL_WINDOW_SIZE,
+    height: NORMAL_WINDOW_SIZE,
     minWidth: 88,
     minHeight: 88,
     frame: false,
